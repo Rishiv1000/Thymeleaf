@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.com">
+<head>
+
+    <script>
+        function loadStateCountry(){
+                let cityId = document.getElementById("city").value;
+
+                fetch("/city/" + cityId).then(res => res.json())
+                        .then( data =>{
+                        document.getElementById("state").value= data.state;
+                        document.getElementById("country").value= data.country;
+                        })
+         }
+
+        function ageCal(){
+                let dob = document.getElementById("dob").value;
+                let doj = document.getElementById("doj").value;
+                let dobDate = new Date(dob);
+                let dojDate = new Date(doj);
+                let age = dojDate.getFullYear() - dobDate.getFullYear();
+                let monthDiff = dojDate.getMonth() - dobDate.getMonth();
+                if(dobDate >  dojDate){
+                document.getElementById("age").value = 0;
+                }
+
+                document.getElementById("age").value = age;
+        }
+
+        window.onload = function () {
+            if (document.getElementById("city").value !== "") {
+                loadStateCountry();
+            }
+
+            if (document.getElementById("dob").value !== "" && document.getElementById("doj").value !== "") {
+                ageCal()
+            }
+        }
+    </script>
+    <style>
+
+             body {
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body >
+
+<a href="/students">
+    <button type="button">View List of Students</button>
+</a>
+
+<h1 style="align-item:center"> Student Registration</h1>
+<form th:action="@{/save}" th:object="${student}" method="post" >
+    <input type="hidden" th:field="*{studentId}" />
+    name:<input th:field="*{name}"><br>
+    dob: <input id="dob" type="date" th:field="*{dob}" onchange="ageCal()" />
+    doj: <input id="doj" type="date" th:field="*{doj}" onchange="ageCal()" />
+
+<!--    dob:  <input id="dob" type="date" th:field="*{dob}" th:value="${#temporals.format(student.dob, 'yyyy-MM-dd')}" onchange="ageCal()" >-->
+<!--    doj: <input id="doj" type="date" th:field="*{doj}" th:value="${#temporals.format(student.doj, 'yyyy-MM-dd')}" onchange="ageCal()">-->
+
+    Age: <input id="age" disabled><br>
+    address:<input th:field="*{address}"><br>
+    mobileNo:<input th:field="*{mobileNo}"><br>
+
+    city: <select id="city" th:field="*{city.cityId}"  onchange=loadStateCountry()>
+        <option value="">Select</option>
+        <option th:each="c : ${cities}"
+                th:value="${c.cityId}"
+                th:text="${c.cityName}">
+        </option>
+    </select><br><br>
+
+    State: <input  id="state" readonly><br><br>
+    Country: <input id="country" readonly><br><br>
+
+    <button type="submit">Submit</button><br>
+
+</form>
+
+</body>
+
+</html>
